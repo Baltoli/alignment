@@ -32,8 +32,7 @@ struct alignment {
       options<T> opts, Iterator a_begin, Iterator a_end, Iterator b_begin,
       Iterator b_end);
 
-  std::pair<std::vector<aligned_element_t>, std::vector<aligned_element_t>>
-  trace_back() const;
+  auto trace_back() const;
 
   void dump_scores();
 
@@ -92,12 +91,18 @@ alignment<T, Iterator>::alignment(
 }
 
 template <typename T, typename Iterator>
-std::pair<
-    std::vector<typename alignment<T, Iterator>::aligned_element_t>,
-    std::vector<typename alignment<T, Iterator>::aligned_element_t>>
-alignment<T, Iterator>::trace_back() const
+auto alignment<T, Iterator>::trace_back() const
 {
-  return {{}, {}};
+  using elt = alignment<T, Iterator>::aligned_element_t;
+
+  auto a_align = std::vector<elt> {};
+  auto b_align = std::vector<elt> {};
+
+  // Start at rs-1, cs-1 and check the three neighbours
+  // Read off characters of a, b depending on the move
+  // Finally reverse the
+
+  return std::pair {a_align, b_align};
 }
 
 template <typename T, typename Iterator>
