@@ -8,6 +8,9 @@
 
 namespace align {
 
+struct gap {
+};
+
 template <typename T>
 struct options {
   template <typename F>
@@ -23,9 +26,14 @@ struct options {
 
 template <typename T, typename Iterator>
 struct alignment {
+  using aligned_element_t = std::variant<T, gap>;
+
   alignment(
       options<T> opts, Iterator a_begin, Iterator a_end, Iterator b_begin,
       Iterator b_end);
+
+  std::pair<std::vector<aligned_element_t>, std::vector<aligned_element_t>>
+  trace_back() const;
 
   void dump_scores();
 
@@ -81,6 +89,15 @@ alignment<T, Iterator>::alignment(
       score_at(row, col) = std::max({match, a_gap, b_gap});
     }
   }
+}
+
+template <typename T, typename Iterator>
+std::pair<
+    std::vector<typename alignment<T, Iterator>::aligned_element_t>,
+    std::vector<typename alignment<T, Iterator>::aligned_element_t>>
+alignment<T, Iterator>::trace_back() const
+{
+  return {{}, {}};
 }
 
 template <typename T, typename Iterator>
