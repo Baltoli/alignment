@@ -8,11 +8,11 @@ int char_match(char a, char b) { return a == b ? 1 : -1; }
 
 int main()
 {
-  auto opts = align::options<char>(char_match, -1);
+  auto opts = align::needleman::options<char>(char_match, -1);
   auto str_a = "GATTACA"s;
   auto str_b = "GATTTTCTAGA"s;
 
-  auto align = align::alignment(
+  auto align = align::needleman::alignment(
       opts, str_a.begin(), str_a.end(), str_b.begin(), str_b.end());
 
   align.dump_scores();

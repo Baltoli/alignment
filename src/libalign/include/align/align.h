@@ -12,6 +12,8 @@ namespace align {
 struct gap {
 };
 
+namespace needleman {
+
 template <typename T>
 struct options {
   template <typename F>
@@ -189,5 +191,7 @@ int const& alignment<T, Iterator>::score_at(int row, int col) const
 {
   return data_[row * cols_ + col];
 }
+
+} // namespace needleman
 
 } // namespace align
