@@ -5,6 +5,7 @@
 #include <iostream>
 #include <memory>
 #include <variant>
+#include <vector>
 
 namespace align {
 
@@ -48,6 +49,7 @@ private:
   int cols_;
 
   int& score_at(int row, int col);
+  int const& score_at(int row, int col) const;
 
   std::unique_ptr<int[]> data_;
 };
@@ -98,9 +100,41 @@ auto alignment<T, Iterator>::trace_back() const
   auto a_align = std::vector<elt> {};
   auto b_align = std::vector<elt> {};
 
-  // Start at rs-1, cs-1 and check the three neighbours
-  // Read off characters of a, b depending on the move
-  // Finally reverse the
+  auto row = rows_ - 1;
+  auto col = cols_ - 1;
+
+  while (row > 0 || col > 0) {
+    auto val = score_at(row, col);
+
+    if (col > 0 && val == score_at(row, col - 1) + opts_.indel_score) {
+      a_align.push_back(gap {});
+      b_align.push_back(*(b_begin_ + (col - 1)));
+      --col;
+      continue;
+    }
+
+    if ((col > 0 && row > 0)
+        && val
+               == score_at(row - 1, col - 1)
+                      + opts_.match_score(
+                          *(a_begin_ + (row - 1)), *(b_begin_ + (col - 1)))) {
+      a_align.push_back(*(a_begin_ + (row - 1)));
+      b_align.push_back(*(b_begin_ + (col - 1)));
+      --row;
+      --col;
+      continue;
+    }
+
+    if (row > 0 && val == score_at(row - 1, col) + opts_.indel_score) {
+      a_align.push_back(*(a_begin_ + (row - 1)));
+      b_align.push_back(gap {});
+      --row;
+      continue;
+    }
+  }
+
+  std::reverse(a_align.begin(), a_align.end());
+  std::reverse(b_align.begin(), b_align.end());
 
   return std::pair {a_align, b_align};
 }
@@ -146,6 +180,12 @@ void alignment<T, Iterator>::dump_scores()
 
 template <typename T, typename Iterator>
 int& alignment<T, Iterator>::score_at(int row, int col)
+{
+  return data_[row * cols_ + col];
+}
+
+template <typename T, typename Iterator>
+int const& alignment<T, Iterator>::score_at(int row, int col) const
 {
   return data_[row * cols_ + col];
 }
