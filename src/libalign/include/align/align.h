@@ -7,4 +7,5 @@
 #include <variant>
 #include <vector>
 
+#include <align/gatoh.h>
 #include <align/needleman.h>
