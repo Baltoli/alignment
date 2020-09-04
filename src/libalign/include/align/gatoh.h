@@ -56,6 +56,13 @@ private:
   int rows_;
   int cols_;
 
+  int gap_score(int length) const
+  {
+    return opts_.start_score + opts_.extend_score * length;
+  }
+
+  void dump_scores(std::unique_ptr<traceback_element[]> const&) const;
+
   traceback& D(int row, int col) { return D_[row * cols_ + col]; }
   traceback const& D(int row, int col) const { return D_[row * cols_ + col]; }
 
@@ -94,10 +101,31 @@ alignment<T, Iterator>::alignment(
 template <typename T, typename Iterator>
 auto alignment<T, Iterator>::trace_back() const
 {
+  using elt = alignment<T, Iterator>::aligned_element_t;
+
+  auto a_align = std::vector<elt> {};
+  auto b_align = std::vector<elt> {};
+
+  return std::pair {a_align, b_align};
 }
 
 template <typename T, typename Iterator>
 void alignment<T, Iterator>::dump_scores() const
+{
+  std::cout << "D\n";
+  dump_scores(D_);
+
+  std::cout << "P\n";
+  dump_scores(P_);
+
+  std::cout << "Q\n";
+  dump_scores(Q_);
+}
+
+template <typename T, typename Iterator>
+void alignment<T, Iterator>::dump_scores(
+    std::unique_ptr<
+        typename alignment<T, Iterator>::traceback_element[]> const&) const
 {
 }
 
