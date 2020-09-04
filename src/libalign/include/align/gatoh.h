@@ -124,9 +124,52 @@ void alignment<T, Iterator>::dump_scores() const
 
 template <typename T, typename Iterator>
 void alignment<T, Iterator>::dump_scores(
-    std::unique_ptr<
-        typename alignment<T, Iterator>::traceback_element[]> const&) const
+    std::unique_ptr<typename alignment<T, Iterator>::traceback_element[]> const&
+        data) const
 {
+  auto score_at = [&data, this](auto row, auto col) {
+    return data[row * cols_ + col].first;
+  };
+
+  auto compare_tb
+      = [](auto const& a, auto const& b) { return a.first < b.first; };
+
+  constexpr bool use_chars = std::is_same_v<char, T>;
+
+  auto begin = data.get();
+  auto end = data.get() + (rows_ * cols_);
+
+  auto max = std::max_element(begin, end, compare_tb)->first;
+  auto min = std::min_element(begin, end, compare_tb)->first;
+
+  auto elt_width
+      = std::max({std::to_string(max).size(), std::to_string(min).size()}) + 1;
+
+  std::cout << std::right;
+
+  if constexpr (use_chars) {
+    std::cout << "  " << std::setw(elt_width) << ' ' << ' ';
+
+    for (auto col = 1; col < cols_; ++col) {
+      std::cout << std::setw(elt_width) << *(b_begin_ + (col - 1)) << ' ';
+    }
+
+    std::cout << '\n';
+  }
+
+  for (auto row = 0; row < rows_; ++row) {
+    if constexpr (use_chars) {
+      std::cout << (row > 0 ? *(a_begin_ + (row - 1)) : ' ') << ' ';
+    }
+
+    for (auto col = 0; col < cols_; ++col) {
+      std::cout << std::setw(elt_width) << score_at(row, col) << ' ';
+    }
+
+    std::cout << '\n';
+  }
+
+  std::cout << "\n\n";
 }
 
 } // namespace align::gatoh
